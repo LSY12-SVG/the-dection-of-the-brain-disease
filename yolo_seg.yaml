@@ -1,0 +1,6 @@
+path: C:\Users\lsy\Desktop\AI生成世界\肿瘤模型数据集\yolo_seg_ds
+train: images/train
+val: images/val
+
+names:
+  0: tumor

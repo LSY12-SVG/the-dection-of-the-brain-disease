@@ -1,0 +1,75 @@
+filename,yolo_tumor,cam_pred,combined_tumor
+24 no.jpg,no,1,yes
+25 no.jpg,no,0,no
+26 no.jpg,no,0,no
+27 no.jpg,no,0,no
+28 no.jpg,no,0,no
+29 no.jpg,no,0,no
+38 no.jpg,no,0,no
+39 no.jpg,no,0,no
+40 no.jpg,no,0,no
+41 no.jpg,no,0,no
+42 no.jpg,no,0,no
+43 no.jpg,no,0,no
+N11.jpg,no,0,no
+N15.jpg,no,0,no
+N2.JPG,no,1,yes
+N3.jpg,no,0,no
+N5.jpg,no,0,no
+N6.jpg,no,0,no
+Y100.JPG,yes,0,yes
+Y101.jpg,yes,0,yes
+Y102.jpg,yes,0,yes
+Y103.jpg,yes,1,yes
+Y104.jpg,yes,0,yes
+Y105.jpg,yes,1,yes
+Y106.jpg,yes,0,yes
+Y107.jpg,yes,0,yes
+Y108.jpg,yes,0,yes
+Y109.JPG,yes,1,yes
+Y115.JPG,yes,0,yes
+Y116.JPG,yes,0,yes
+Y117.JPG,yes,0,yes
+Y120.JPG,yes,0,yes
+Y146.JPG,yes,0,yes
+Y147.JPG,yes,1,yes
+Y148.JPG,yes,1,yes
+Y153.jpg,yes,1,yes
+Y154.jpg,yes,0,yes
+Y155.JPG,yes,0,yes
+Y160.JPG,yes,0,yes
+Y161.JPG,yes,0,yes
+Y162.jpg,yes,0,yes
+Y163.JPG,yes,0,yes
+Y164.JPG,yes,0,yes
+Y165.JPG,yes,0,yes
+Y166.JPG,yes,1,yes
+Y167.JPG,yes,0,yes
+Y168.jpg,no,1,yes
+Y169.jpg,yes,1,yes
+Y183.jpg,yes,0,yes
+Y184.JPG,yes,0,yes
+Y185.jpg,no,1,yes
+Y186.jpg,yes,1,yes
+Y187.jpg,yes,0,yes
+Y188.jpg,yes,0,yes
+Y192.JPG,yes,0,yes
+Y193.JPG,yes,0,yes
+Y194.jpg,yes,0,yes
+Y195.JPG,yes,0,yes
+Y246.JPG,yes,0,yes
+Y247.JPG,yes,0,yes
+Y248.JPG,yes,0,yes
+Y249.JPG,yes,0,yes
+Y250.jpg,yes,0,yes
+Y251.JPG,yes,0,yes
+Y252.jpg,yes,0,yes
+Y253.JPG,yes,0,yes
+Y254.jpg,yes,0,yes
+Y255.JPG,yes,0,yes
+no 2.jpg,no,0,no
+no 3.jpg,no,0,no
+no 4.jpg,no,0,no
+no 5.jpeg,no,0,no
+no 6.jpg,no,0,no
+no 7.jpeg,no,0,no

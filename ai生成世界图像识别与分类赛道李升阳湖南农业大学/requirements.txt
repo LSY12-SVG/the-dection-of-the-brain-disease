@@ -1,0 +1,19 @@
+# Core dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+numpy
+pandas
+Pillow
+opencv-python
+ultralytics
+timm
+scikit-learn
+matplotlib
+
+# Web dependencies
+flask>=2.0.0
+flask-cors>=3.0.0
+werkzeug>=2.0.0
+
+# Additional utilities
+pathlib2; python_version < "3.4"

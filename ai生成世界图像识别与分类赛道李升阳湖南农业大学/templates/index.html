@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脑肿瘤检测系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section.dragover {
+            border-color: #4facfe;
+            background: #e7f3ff;
+        }
+
+        .upload-area {
+            padding: 40px;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #4facfe;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e9ecef;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .prediction-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .tumor-detected {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .no-tumor {
+            background: #51cf66;
+            color: white;
+        }
+
+        .confidence-meter {
+            margin: 15px 0;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #51cf66, #feca57, #ff6b6b);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-container {
+            text-align: center;
+        }
+
+        .image-container img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-label {
+            margin-top: 10px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #4facfe;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4facfe;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .model-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .batch-results {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+        }
+
+        .batch-item {
+            padding: 15px;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .batch-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            main {
+                padding: 20px;
+            }
+            
+            .images-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 脑肿瘤检测系统</h1>
+            <p>基于深度学习的医学影像智能诊断平台</p>
+        </header>
+        
+        <main>
+            <div class="model-info">
+                <h3>🤖 模型信息</h3>
+                <p id="model-status">正在加载模型信息...</p>
+            </div>
+
+            <section class="upload-section" id="uploadSection">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📤</div>
+                    <h3>上传医学影像</h3>
+                    <p>点击选择或拖拽图片文件到此处</p>
+                    <p style="color: #6c757d; margin-top: 10px;">支持格式: PNG, JPG, JPEG, BMP, TIF, TIFF</p>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                    <button class="btn" style="margin-top: 20px;">选择文件</button>
+                </div>
+            </section>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <h3>正在分析影像...</h3>
+                <p>请稍候，AI模型正在进行智能诊断</p>
+            </div>
+
+            <section class="results-section" id="results">
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-title">检测结果</div>
+                        <div class="prediction-badge" id="predictionBadge">处理中...</div>
+                    </div>
+                    
+                    <div class="confidence-meter">
+                        <h4>置信度</h4>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="probabilityValue">-</div>
+                            <div class="stat-label">肿瘤概率</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="confidenceValue">-</div>
+                            <div class="stat-label">置信度</div>
+                        </div>
+                    </div>
+
+                    <div class="images-grid" id="imagesGrid">
+                        <div class="image-container">
+                            <img id="originalImage" alt="原始影像">
+                            <div class="image-label">原始影像</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section" id="batchResults" style="display: none;">
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-title">批量检测结果</div>
+                        <button class="btn" onclick="exportResults()">导出结果</button>
+                    </div>
+                    <div class="batch-results" id="batchResultsList"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let currentResults = null;
+
+        // 页面加载时获取模型信息
+        async function loadModelInfo() {
+            try {
+                const response = await fetch('/api/model_info');
+                const info = await response.json();
+                document.getElementById('model-status').innerHTML = `
+                    <strong>设备:</strong> ${info.device}<br>
+                    <strong>检测模型:</strong> ${info.detection_model_loaded ? '已加载' : '未加载'} (${info.model_types.detection})<br>
+                    <strong>分割模型:</strong> ${info.segmentation_model_loaded ? '已加载' : '未加载'} (${info.model_types.segmentation})
+                `;
+            } catch (error) {
+                document.getElementById('model-status').innerHTML = '无法获取模型信息';
+            }
+        }
+
+        // 拖拽上传功能
+        const uploadSection = document.getElementById('uploadSection');
+        
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // 文件选择处理
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('请选择图片文件');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // 显示加载状态
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                showError('检测失败: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayResults(result) {
+            currentResults = result;
+            
+            // 更新预测结果
+            const predictionBadge = document.getElementById('predictionBadge');
+            if (result.prediction === 'tumor_detected') {
+                predictionBadge.textContent = '检测到肿瘤';
+                predictionBadge.className = 'prediction-badge tumor-detected';
+            } else {
+                predictionBadge.textContent = '未检测到肿瘤';
+                predictionBadge.className = 'prediction-badge no-tumor';
+            }
+
+            // 更新置信度
+            const confidence = (result.confidence * 100).toFixed(1);
+            document.getElementById('confidenceFill').style.width = confidence + '%';
+            document.getElementById('confidenceFill').textContent = confidence + '%';
+            
+            document.getElementById('confidenceValue').textContent = confidence + '%';
+            document.getElementById('probabilityValue').textContent = (result.probability * 100).toFixed(1) + '%';
+
+            // 显示图片
+            const imagesGrid = document.getElementById('imagesGrid');
+            imagesGrid.innerHTML = `
+                <div class="image-container">
+                    <img src="data:image/png;base64,${result.original_image}" alt="原始影像">
+                    <div class="image-label">原始影像</div>
+                </div>
+            `;
+
+            if (result.prediction === 'tumor_detected') {
+                let additionalImages = '';
+                
+                if (result.cam_image) {
+                    additionalImages += `
+                        <div class="image-container">
+                            <img src="data:image/png;base64,${result.cam_image}" alt="热力图">
+                            <div class="image-label">注意力热力图</div>
+                        </div>
+                    `;
+                }
+
+                if (result.mask_image) {
+                    additionalImages += `
+                        <div class="image-container">
+                            <img src="data:image/png;base64,${result.mask_image}" alt="分割掩码">
+                            <div class="image-label">肿瘤掩码</div>
+                        </div>
+                    `;
+                }
+
+                if (result.bbox_image) {
+                    additionalImages += `
+                        <div class="image-container">
+                            <img src="data:image/png;base64,${result.bbox_image}" alt="边界框">
+                            <div class="image-label">肿瘤定位</div>
+                        </div>
+                    `;
+                }
+
+                imagesGrid.innerHTML += additionalImages;
+
+                // 显示边界框信息
+                if (result.bbox) {
+                    const bboxInfo = document.createElement('div');
+                    bboxInfo.className = 'stat-card';
+                    bboxInfo.innerHTML = `
+                        <strong>肿瘤位置:</strong> (${result.bbox[0]}, ${result.bbox[1]}) - (${result.bbox[2]}, ${result.bbox[3]})
+                    `;
+                    imagesGrid.appendChild(bboxInfo);
+                }
+            }
+
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            const main = document.querySelector('main');
+            main.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function exportResults() {
+            if (!currentResults) return;
+            
+            const dataStr = JSON.stringify(currentResults, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'detection_result.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', loadModelInfo);
+    </script>
+</body>
+</html>
