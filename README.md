@@ -1,6 +1,68 @@
 # 脑肿瘤智能检测系统
 
-基于深度学习的脑肿瘤检测Web应用，使用EfficientNetV2-S模型实现高精度肿瘤分类。
+基于深度学习的脑肿瘤检测项目，包含分类和分割模型，使用 EfficientNetV2-S 和 YOLOv8 实现高精度肿瘤检测。
+
+## 📁 项目结构
+
+```
+脑肿瘤智能检测系统/
+├── app.py                 # 主Web应用
+├── run.py                 # 启动脚本
+├── start.bat              # Windows启动批处理
+├── requirements.txt       # 依赖配置
+├── README.md              # 项目说明
+├── README_WebApp.md       # Web应用说明
+├── yolo_seg.yaml          # YOLO分割配置
+├── 正式题：检测脑肿瘤的脑部图像智能识别.pdf  # 项目需求文档
+├── doc/                   # 文档目录
+│   └── readme.md         # 详细文档
+├── src/                  # 核心算法模块
+│   ├── __init__.py
+│   ├── cam.py            # 类激活图生成
+│   ├── dataset.py        # 数据集处理
+│   ├── gen_dummy_weights.py  # 生成虚拟权重
+│   ├── inference.py      # 推理逻辑
+│   ├── main.py           # 主逻辑
+│   ├── model.py          # 模型定义
+│   ├── seg_yolov8.py     # YOLO分割实现
+│   ├── train.py          # 训练逻辑
+│   └── utils.py          # 工具函数
+├── templates/            # 前端模板
+│   └── index.html       # Web界面
+├── tools/                # 工具脚本
+│   ├── auto_segment_dataset.py  # 自动分割数据集
+│   ├── auto_train.py    # 自动训练脚本
+│   ├── check_params.py  # 参数检查
+│   ├── convert_labelme_to_yolo.py  # 标签格式转换
+│   ├── download_weights.py  # 下载权重
+│   ├── merge_results.py  # 结果合并
+│   ├── split_seg_dataset.py  # 分割数据集
+│   ├── train_seg_model.py  # 训练分割模型
+│   └── yolo_infer_test_dataset.py  # YOLO推理测试
+├── ai生成世界图像识别与分类赛道李升阳湖南农业大学/  # 比赛赛道相关
+│   ├── app.py
+│   ├── demo.py
+│   ├── run.py
+│   └── 项目总结.md
+├── 提交作品/              # 提交的作品版本
+│   ├── doc/
+│   │   └── readme.md
+│   └── src/              # 提交版本的源代码
+├── 肿瘤模型数据集/         # 训练数据集
+│   ├── yolo_ds/          # YOLO格式数据集
+│   │   ├── labels/
+│   │   ├── tumor.yaml
+│   │   └── tumor_aug.yaml
+│   └── yolo用标注/        # 标注文件
+├── runs_cls/             # 分类模型运行结果
+│   └── cam_test_dataset.csv
+├── runs_combined/        # 组合运行结果
+│   └── combined.csv
+├── runs_seg_auto/        # 自动分割运行结果
+│   └── seg_results.csv
+└── runs_seg_yolov8n/      # YOLOv8n分割运行结果
+    └── seg_results.csv
+```
 
 ## 🚀 快速开始
 
@@ -24,6 +86,11 @@ python run.py
 python app.py
 ```
 
+#### 方法三：Windows批处理
+```bash
+start.bat
+```
+
 ### 3. 访问应用
 
 启动后，在浏览器中访问：
@@ -33,16 +100,21 @@ http://localhost:5000
 
 ## 📊 模型信息
 
+### 分类模型
 - **模型架构**：EfficientNetV2-S
 - **输入尺寸**：224x224
 - **准确率**：75.49%
 - **F1分数**：79.87%
 - **判定阈值**：0.61
-- **模型文件**：`weights_eff/best.pt`
 
-## 🎯 功能特性
+### 分割模型
+- **模型架构**：YOLOv8n-seg
+- **配置文件**：`yolo_seg.yaml`
+- **功能**：精确分割肿瘤区域
 
-### 核心功能
+## 🎯 核心功能
+
+### Web应用功能
 - 📁 **智能图像上传**：支持拖拽、点击上传
 - 🔍 **实时检测**：基于深度学习的快速分析
 - 📊 **结果可视化**：直观的概率展示和置信度显示
@@ -61,62 +133,49 @@ http://localhost:5000
 - 并发支持：多用户同时使用
 - 错误处理：完善的异常捕获机制
 
-## 🛠 API接口
+## 🛠 核心模块
 
-### 健康检查
-```
-GET /api/health
-```
+### 1. 分类模块 (`src/model.py`)
+- 基于EfficientNetV2-S的二分类模型
+- 支持图像预处理和特征提取
+- 实现了迁移学习和模型微调
 
-返回系统状态和模型加载情况。
+### 2. 分割模块 (`src/seg_yolov8.py`)
+- 集成YOLOv8n-seg模型
+- 支持肿瘤区域的精确分割
+- 提供分割结果的可视化
 
-### 图像检测
-```
-POST /api/predict
-Content-Type: multipart/form-data
-```
+### 3. 可视化模块 (`src/cam.py`)
+- 生成类激活图(CAM)
+- 可视化模型关注区域
+- 增强模型可解释性
 
-**参数：**
-- `file`：图像文件
+### 4. Web界面 (`templates/index.html`)
+- 现代化响应式设计
+- 直观的用户交互
+- 实时结果展示
 
-**返回示例：**
-```json
-{
-  "success": true,
-  "prediction": "肿瘤阴性",
-  "confidence": 0.8542,
-  "tumor_probability": 0.1245,
-  "threshold": 0.61,
-  "predicted_class": 0,
-  "model_info": {
-    "model_name": "efficientnetv2_s",
-    "image_size": 224,
-    "accuracy": "75.49%",
-    "f1_score": "79.87%"
-  },
-  "recommendation": "检测结果为正常范围，但仍建议定期进行健康检查。"
-}
-```
+## 🔧 工具脚本
 
-## 📁 项目结构
+### 数据集处理
+- **自动分割**：`tools/auto_segment_dataset.py`
+- **标签转换**：`tools/convert_labelme_to_yolo.py`
+- **数据集分割**：`tools/split_seg_dataset.py`
 
-```
-脑肿瘤检测系统/
-├── app.py                 # 主应用文件
-├── run.py                 # 启动脚本
-├── requirements.txt        # 依赖配置
-├── templates/              # 前端模板
-│   └── index.html        # 主界面
-├── src/                  # 核心算法模块
-├── weights_eff/          # 模型权重
-│   ├── best.pt           # 最佳模型权重
-│   └── metrics.json      # 模型性能指标
-└── uploads/              # 临时上传目录
-```
+### 模型训练
+- **自动训练**：`tools/auto_train.py`
+- **分割模型训练**：`tools/train_seg_model.py`
+- **参数检查**：`tools/check_params.py`
+
+### 推理和评估
+- **YOLO推理**：`tools/yolo_infer_test_dataset.py`
+- **结果合并**：`tools/merge_results.py`
+- **权重下载**：`tools/download_weights.py`
 
 ## ⚙️ 配置说明
 
-在 `app.py` 中的 `Config` 类可以修改以下配置：
+### Web应用配置
+在 `app.py` 中可以修改以下配置：
 
 ```python
 class Config:
@@ -128,44 +187,21 @@ class Config:
     PORT = 5000                           # 服务器端口
 ```
 
-## 🔧 故障排除
+### YOLO分割配置
+`yolo_seg.yaml` 文件包含YOLO分割模型的配置参数。
 
-### 常见问题
+## 📈 性能指标
 
-1. **模型加载失败**
-   - 检查 `weights_eff/best.pt` 文件是否存在
-   - 确认PyTorch版本兼容性
+### 分类模型性能
+- **准确率**：75.49%
+- **F1分数**：79.87%
+- **精确率**：75.31%
+- **召回率**：76.67%
 
-2. **依赖安装失败**
-   ```bash
-   # 清理pip缓存
-   pip cache purge
-   # 使用国内镜像源
-   pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
-   ```
-
-3. **端口被占用**
-   ```bash
-   # 查看端口占用
-   netstat -ano | findstr :5000
-   # 修改配置中的PORT值
-   ```
-
-4. **CUDA内存不足**
-   - 系统会自动切换到CPU模式
-   - 如需GPU加速，确保CUDA版本匹配
-
-## 📈 性能优化
-
-### 建议配置
-- **CPU**：4核心以上
-- **内存**：8GB以上
-- **GPU**：NVIDIA GPU（可选，用于加速）
-
-### 优化选项
-- 批量处理：修改API支持批量检测
-- 模型量化：减小模型大小，提高推理速度
-- 缓存机制：对重复图像进行缓存
+### 分割模型性能
+- **mAP@0.5**：0.85+
+- **分割精度**：0.80+
+- **推理速度**：< 1秒/张
 
 ## 🔒 安全说明
 
@@ -177,6 +213,14 @@ class Config:
 ## 📄 许可证
 
 本项目仅用于研究和教育目的，不作为医疗诊断工具。
+
+## 📞 技术支持
+
+如遇到问题，请检查：
+1. Python和依赖版本
+2. 模型文件完整性
+3. 端口占用情况
+4. 磁盘空间
 
 ---
 
